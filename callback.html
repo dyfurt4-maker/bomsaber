@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+  <html lang="pt">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BomSaber - TikTok Callback</title>
+  <style>
+  body { font-family: system-ui, sans-serif; max-width: 520px; margin: 0 auto; padding: 2rem 1rem; line-height: 1.7; background: #191B4B; color: #fff; text-align: center; }
+h1 { color: #FFD700; font-size: 1.5rem; }
+  .code-box { background: #0d0e2a; border: 2px solid #3278DC; border-radius: 8px; padding: 1rem; margin: 1.5rem 0; word-break: break-all; font-family: monospace; font-size: 0.95rem; color: #7fdbca; cursor: pointer; }
+.btn { background: #3278DC; color: #fff; border: none; padding: 0.7rem 2rem; border-radius: 6px; font-size: 1rem; cursor: pointer; margin: 0.5rem; }
+.btn:hover { background: #2565c0; }
+.success { color: #4caf50; }
+.error { color: #ff6b6b; }
+  .info { color: #aaa; font-size: 0.85rem; margin-top: 2rem; }
+  #status { margin: 1rem 0; }
+  </style>
+  </head>
+  <body>
+  <h1>BomSaber</h1>
+  <div id="content"></div>
+  <script>
+  const params = new URLSearchParams(window.location.search);
+const code = params.get('code');
+const error = params.get('error');
+const errorDesc = params.get('error_description');
+const state = params.get('state');
+const el = document.getElementById('content');
+
+if (error) {
+  el.innerHTML = '<p class="error">Erro: ' + error + '</p>' +
+    (errorDesc ? '<p>' + errorDesc + '</p>' : '');
+} else if (code) {
+  el.innerHTML = '<p class="success">Autorizado com sucesso!</p>' +
+    '<div id="status">A redirecionar para o servidor local...</div>' +
+    '<div class="code-box" id="codebox" onclick="copyCode()" title="Clica para copiar">' + code + '</div>' +
+    '<button class="btn" onclick="copyCode()">Copiar Codigo</button>' +
+    '<p class="info">Se o redirecionamento falhar, copia o codigo acima e cola no terminal.</p>';
+
+  var localUrl = 'http://localhost:3456/callback?' + window.location.search.substring(1);
+  setTimeout(function() {
+    window.location.href = localUrl;
+}, 1500);
+
+  setTimeout(function() {
+    document.getElementById('status').innerHTML = '<p>O servidor local nao respondeu.</p><p>Copia o codigo e cola no terminal.</p>';
+}, 4000);
+} else {
+  el.innerHTML = '<p>Nenhum codigo recebido.</p><p class="info">Esta pagina e o callback OAuth do TikTok.</p>';
+}
+
+function copyCode() {
+  navigator.clipboard.writeText(code).then(function() {
+    document.getElementById('codebox').style.borderColor = '#4caf50';
+    document.getElementById('codebox').innerHTML = code + ' <span class="success">(copiado!)</span>';
+});
+}
+</script>
+</body>
+</html>
